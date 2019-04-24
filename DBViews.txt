@@ -1,0 +1,78 @@
+-- total visiting
+create view totalvisit as
+select
+  time :: date as dates,
+  count(status) as visits
+from
+  log
+group by
+  dates
+order by
+  dates
+
+  -- total errors 404 NOT FOUND
+  create view totalerrors as
+select
+  time :: date as dates,
+  count(status) as errorPerDay
+from
+  log
+where
+  status = '404 NOT FOUND'
+group by
+  dates
+order by
+  dates
+
+
+  -- get errors > 1  order by desc
+
+SELECT totalerrors
+  FROM TotalErrors
+ WHERE errorperday > 1
+ ORDER BY errorperday DESC limit 1;
+
+
+  -- total 200 OK
+  create view TotalOK as
+select
+  time :: date as date,
+  count(status) as visit
+from
+  log
+  where log.status = '200 OK'
+group by
+  date
+order by
+  date;
+
+  -- Showing persntage of the error
+  create view error_Persntage as
+select
+  totalvisit.dates,
+  round(100.00 * errorPerDay / visits, 3) as Persentage
+from
+  totalvisit,
+  totalerrors
+where
+  totalvisit.dates = totalerrors.dates
+
+  -- showing results by error > 1
+select
+  *
+from
+  error_Persntage
+where
+  persentage > 1
+limit
+  2;
+
+
+  -- puting two in one
+
+SELECT *
+  FROM TotalErrors, error_Persntage
+ WHERE errorperday > 1 and  persentage > 1
+ ORDER BY errorperday DESC limit 1;
+
+
